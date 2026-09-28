@@ -1,107 +1,139 @@
-# 📘 Manual del Desarrollador — Sistema de Reservas Complejo Deportivo
+# 🏟️ Sistema de Reservas — Complejo Deportivo
 
-> Para el equipo que continúa con las iteraciones.
+Aplicación web para administrar un complejo deportivo: reserva de canchas, pagos con comprobante, eventos con inscripción de cupo limitado y reportes para administración.
 
----
+## Índice
 
-## ✅ Requisitos previos (instalar una sola vez)
+- [Stack tecnológico](#stack-tecnológico)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Cómo iniciar el proyecto](#cómo-iniciar-el-proyecto)
+- [Usuarios de prueba](#usuarios-de-prueba)
+- [Servicios implementados](#servicios-implementados)
+- [Arquitectura y flujo de comunicación](#arquitectura-y-flujo-de-comunicación)
+- [Comandos útiles](#comandos-útiles)
+- [Notas y pendientes conocidos](#notas-y-pendientes-conocidos)
 
-| Herramienta        | Para qué sirve            | Descarga                                       |
-| ------------------ | ------------------------- | ---------------------------------------------- |
-| **Node.js v20+**   | Correr frontend y backend | https://nodejs.org                             |
-| **Docker Desktop** | Base de datos PostgreSQL  | https://www.docker.com/products/docker-desktop |
-| **Git**            | Control de versiones      | https://git-scm.com                            |
+## Stack tecnológico
 
----
+**Backend** (`backend/`)
+- Node.js 20 + Express 4, en TypeScript
+- PostgreSQL vía `pg` — SQL puro, sin ORM
+- JWT (`jsonwebtoken`) + `bcrypt` para autenticación
+- `multer` para subir fotos de perfil y comprobantes de pago
+- `nodemailer` (Gmail SMTP) para el correo de recuperación de contraseña
 
-## 🚀 Cómo poner en marcha el proyecto (primera vez)
+**Frontend** (`frontend/`)
+- React 18 + Vite + TypeScript
+- React Router 7
+- Axios como cliente HTTP
+- Tailwind CSS
+- `@nivo/heatmap` y `@nivo/pie` para las gráficas de reportes
+- `jspdf`, `html2canvas` y `xlsx` para exportar reportes
 
-### Paso 1 — Clonar el repositorio
+**Infraestructura**
+- PostgreSQL 15 (`postgres:15-alpine`) + pgAdmin 4
+- Docker Compose orquesta los 4 servicios: base de datos, pgAdmin, backend y frontend
+
+## Estructura del proyecto
+
+```text
+Sistema de Reservas Complejo deportivo/
+├── compose.yaml
+├── database/
+│   ├── 01_schema.sql        # Tablas, relaciones y restricciones
+│   └── 02_inserts.sql       # Datos de prueba (seeders)
+├── backend/
+│   ├── .env
+│   ├── Dockerfile
+│   ├── uploads/
+│   │   ├── perfiles/        # Fotos de perfil
+│   │   └── comprobantes/    # Comprobantes de pago
+│   └── src/
+│       ├── server.ts        # Punto de entrada
+│       ├── app.ts           # Configuración de Express y rutas
+│       ├── config/          # Conexión a PostgreSQL
+│       ├── controllers/     # req/res de cada endpoint
+│       ├── services/        # Lógica de negocio (canchas, reservas)
+│       ├── models/          # Consultas SQL
+│       ├── routes/          # Endpoints de la API
+│       ├── middlewares/     # Verificación de JWT y de rol
+│       ├── types/ utils/    # Interfaces y validaciones
+│       └── documents/       # Peticiones de prueba (REST Client)
+└── frontend/
+    ├── Dockerfile
+    ├── vite.config.ts
+    └── src/
+        ├── App.tsx / main.tsx   # Rutas y entrada
+        ├── context/             # AuthContext (sesión), ThemeContext
+        ├── services/api.ts      # Cliente Axios con interceptores
+        ├── components/          # canchas/ reservas/ pagos/ eventos/
+        │                        # usuarios/ reportes/ layout/ landing/
+        └── pages/               # Login, Dashboard, Reportes, etc.
+```
+
+Cada módulo del backend sigue el mismo patrón: `routes → controllers → (services) → models`. Solo **canchas** y **reservas** tienen una capa `services` explícita; el resto llama al modelo directamente desde el controlador.
+
+## Cómo iniciar el proyecto
+
+### Requisitos
+
+| Herramienta | Versión |
+|---|---|
+| Node.js | 20+ |
+| Docker Desktop | última estable |
+| Git | cualquiera |
+
+### Opción A — Todo con Docker
 
 ```bash
 git clone https://github.com/Roberto-Carlos01/Sistema-de-Reservas---Complejo-deportivo-.git
 cd Sistema-de-Reservas---Complejo-deportivo-
+docker compose up -d --build
 ```
 
-### Paso 2 — Configurar variables de entorno del backend
+Levanta los 4 contenedores. La base de datos se siembra sola con `database/01_schema.sql` y `02_inserts.sql`, pero **solo la primera vez** que se crea el volumen (`docker compose down -v` para reiniciarla desde cero).
+
+### Opción B — Modo desarrollo (recomendado para programar)
 
 ```bash
-# Dentro de la carpeta backend/
-cp .env.example .env
+# 1. Solo la base de datos
+docker compose up -d db
+
+# 2. Backend (nueva terminal)
+cd backend
+npm install
+npm run dev
+
+# 3. Frontend (otra terminal)
+cd frontend
+npm install
+npm run dev
 ```
 
-Luego abrir el archivo `backend/.env` y completar con los datos reales:
+| Servicio | URL |
+|---|---|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:4000 |
+| Health check | http://localhost:4000/api/health |
+| pgAdmin | http://localhost:5050 |
+
+`backend/.env` ya viene incluido con valores de desarrollo; verifica que coincidan con `compose.yaml`:
 
 ```env
-# Configuración del Servidor
 PORT=4000
 
-# Conexión a la Base de Datos PostgreSQL
 DB_USER=limber
 DB_PASSWORD=123456
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=bdcomplejodeportivo
 
-# Seguridad
-JWT_SECRET=super_secreto_sports_2026_desarrollo
+JWT_SECRET=<definir un secreto propio>
 
-# Gmail Smtp 
-EMAIL_USER=soportecanchas0@gmail.com
-EMAIL_PASS=sflxtcggkemlifeu   
+EMAIL_USER=<correo Gmail remitente>
+EMAIL_PASS=<contraseña de aplicación de Gmail>
 FRONTEND_URL=http://localhost:5173
 ```
-
-### Paso 3 — Levantar la base de datos con Docker
-
-```bash
-# Desde la raíz del proyecto
-docker compose up -d db
-```
-
-Esperar ~10 segundos a que PostgreSQL inicialice. Verificar que está corriendo:
-
-```bash
-docker ps
-```
-
-Debe aparecer el contenedor `postgres-db-complejo-deportivo` con estado `Up`.
-
-> **Primera vez solamente:** Docker creará automáticamente la BD, las tablas y los datos de prueba desde `database/01_schema.sql` y `database/02_inserts.sql`.
-
-### Paso 4 — Instalar dependencias e iniciar el backend
-
-```bash
-cd backend
-npm install
-npm run dev
-```
-
-Deberías ver:
-
-```
-✅ [PostgreSQL] Conexión exitosa a la base de datos 'bdcomplejodeportivo'
-🚀 Servidor backend escuchando en: http://localhost:4000
-```
-
-### Paso 5 — Instalar dependencias e iniciar el frontend
-
-En una **nueva terminal**:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Deberías ver:
-
-```
-VITE ready in ...ms
-➜  Local: http://localhost:5173/
-```
-
----
 
 ## 🔑 Usuarios de prueba
 
@@ -112,138 +144,58 @@ VITE ready in ...ms
 | `ana.torrez@canchasbo.com`      | `Passw123` | Empleado      |
 | `maria.lopez@gmail.com`         | `Passw123` | Cliente       |
 
-> Los administradores pueden gestionar canchas, empleados y usuarios.
+## Servicios implementados
 
----
+**Autenticación** (`/api/auth`) — Registro público de clientes, login con JWT (expira a los 15 min) y recuperación de contraseña por correo con token temporal.
 
-## 📁 Estructura del proyecto
+**Usuarios** (`/api/usuarios`) — Perfil propio (ver/editar, con foto) y, desde el panel de administración, listado, creación, edición, cambio de estado (activo/inactivo) y eliminación de usuarios con rol Cliente, Empleado o Admin.
 
-```
-Sistema-de-Reservas-CD/
-├── backend/               ← API REST (Node.js + TypeScript + Express)
-│   ├── src/
-│   │   ├── config/        ← database.ts (conexión PostgreSQL)
-│   │   ├── controllers/   ← lógica de cada endpoint
-│   │   ├── models/        ← queries SQL a la BD
-│   │   ├── routes/        ← definición de rutas
-│   │   ├── services/      ← lógica de negocio
-│   │   ├── middlewares/   ← autenticación JWT
-│   │   └── server.ts      ← punto de entrada
-│   ├── .env               ← ⚠️ NO subir al repo (credenciales)
-│   └── .env.example       ← ✅ plantilla de variables de entorno
-│
-├── frontend/              ← Interfaz de usuario (React + TypeScript + Vite)
-│   └── src/
-│       ├── components/    ← componentes reutilizables
-│       │   ├── landing/   ← Hero, Navbar, Footer (página principal)
-│       │   ├── canchas/   ← gestión de canchas (solo admin)
-│       │   └── usuarios/  ← gestión de usuarios (solo admin)
-│       ├── pages/         ← páginas principales
-│       └── styles/        ← estilos globales
-│
-├── database/              ← Scripts SQL de inicialización
-│   ├── 01_schema.sql      ← Estructura de tablas
-│   └── 02_inserts.sql     ← Datos de prueba (seeders)
-│
-└── docker-compose.yml     ← Orquestación de todos los servicios
+**Canchas** (`/api/canchas`) — CRUD de canchas (crear/editar/eliminar restringido a administradores) y consulta de reservas por cancha para calcular disponibilidad.
+
+**Reservas** (`/api/reservas`) — Creación validando que el horario no se solape con otra reserva. Las reservas en línea quedan `pendiente`; las presenciales (cargadas por un empleado) quedan `confirmada`. El cliente solo puede cancelar con más de 24 horas de anticipación; solo un administrador puede modificar fecha, hora o cancha de una reserva existente.
+
+**Pagos** (`/api/pagos`) — Métodos: presencial, tarjeta de débito, tarjeta de crédito y QR. El monto es precio por hora × horas reservadas. Los métodos virtuales exigen comprobante (imagen o PDF, máx. 5 MB) y quedan `pendiente_verificacion` hasta que un empleado o admin lo aprueba o rechaza. Incluye historial y reintento tras un rechazo.
+
+**Eventos** (`/api/eventos`) — Administradores y empleados crean, editan, reprograman y cancelan eventos (con cancha y servicios contratados). Los clientes se inscriben respetando el cupo máximo; la inscripción y su cancelación usan transacciones SQL para mantener el cupo consistente.
+
+**Reportes** (`/api/reportes`, solo administradores) — Pagos por estado y por método, mapa de calor de ocupación, total de reservas, horas ocupadas, horarios de mayor demanda, rentabilidad de servicios contratados en eventos y comportamiento de usuarios.
+
+## Arquitectura y flujo de comunicación
+
+```text
+Navegador
+   │  http://localhost:5173
+   ▼
+Frontend (React + Vite)
+   │  Axios → /api/...   (header Authorization: Bearer <token>)
+   ▼
+Backend (Express :4000)
+   routes → controllers → services → models
+   │  pool.query(...)
+   ▼
+PostgreSQL (Docker :5432)
 ```
 
-## 🔄 Flujo de trabajo con Git
+La sesión se guarda como JWT en `localStorage`. El frontend cierra sesión automáticamente a los 15 minutos de inactividad, y también ante cualquier respuesta `401`/`403` del backend.
 
-### Antes de empezar a trabajar
+## Comandos útiles
 
 ```bash
-git pull origin main        # Traer los últimos cambios
-```
-
-### Mientras trabajas (guardar avances frecuentemente)
-
-```bash
-git add .
-git commit -m "feat: descripción de lo que hice"
-git push origin main
-```
-
-### Mensajes de commit recomendados
-
-- `feat: agrego animación al hero`
-- `fix: corrijo alineación del navbar en móvil`
-- `style: mejoro paleta de colores del dashboard`
-- `refactor: reorganizo componentes del footer`
-
-### Si hay conflictos al hacer push
-
-```bash
-git pull origin main        # Traer cambios del compañero
-# Resolver conflictos en los archivos marcados
-git add .
-git commit -m "merge: resolución de conflictos"
-git push origin main
-```
-
----
-
-## 🛠️ Comandos útiles del día a día
-
-```bash
-# Reiniciar solo la base de datos (si algo se rompe)
-docker compose restart db
-
-# Ver logs de la BD
+# Logs de la base de datos
 docker logs postgres-db-complejo-deportivo
 
-# Reiniciar TODA la app con Docker
+# Reiniciar todo
 docker compose down
 docker compose up -d
 
-# Reconstruir después de cambios en backend (solo si usas Docker completo)
+# Reconstruir el backend tras cambiar dependencias
 docker compose up -d --build backend
 ```
 
----
+## Notas y pendientes conocidos
 
-## ❓ Problemas frecuentes y soluciones
-
-### "Cannot connect to database"
-
-```bash
-docker ps   # ¿Está corriendo el contenedor de postgres?
-docker compose up -d db   # Si no, levantarlo
-```
-
-### "Port 4000 already in use"
-
-```powershell
-netstat -ano | findstr :4000    # Ver qué proceso usa el puerto
-taskkill /PID <numero> /F       # Matar ese proceso
-```
-
-### "Module not found" en el frontend
-
-```bash
-cd frontend
-npm install   # Reinstalar dependencias
-```
-
-### El backend no encuentra el `.env`
-
-- Verificar que el archivo se llama exactamente `.env` (no `.env.txt`)
-- Debe estar dentro de la carpeta `backend/`
-
----
-
-## 📞 Arquitectura del sistema (resumen)
-
-```
-[Usuario en el navegador]
-         ↓ http://localhost:5173
-    [Frontend - React]
-         ↓ peticiones HTTP a /api/...
-    [Backend - Express]
-         ↓ queries SQL
-    [PostgreSQL en Docker]
-```
-
-**Autenticación:** JWT (JSON Web Token) — el token se guarda en `localStorage` y se envía en cada petición con el header `Authorization: Bearer <token>`.
-
----
+- **Permisos en `/api/usuarios`:** listar, crear, editar, cambiar estado y eliminar usuarios solo exigen un token válido; falta el middleware `esAdmin` para restringirlos a administradores.
+- **`modo_demo` en pagos:** `POST /api/pagos/procesar` acepta un flag `modo_demo` que marca el pago como `pagado` sin comprobante. Solo se desactiva si `NODE_ENV=production`, variable que hoy no está definida ni en `compose.yaml` ni en ningún `.env`.
+- **Extras de reserva** (balón, arbitraje, iluminación) se guardan solo en el `localStorage` del navegador; las tablas `utilidad` y `reserva_utilidad` existen en el esquema pero el backend todavía no las usa.
+- **Secretos versionados:** `backend/.env` y `credenciales.txt` incluyen credenciales reales, entre ellas una contraseña de aplicación de Gmail. Si el repositorio es público, conviene rotarlas y dejar solo un `.env.example` con valores ficticios.
+- `manual_inicio.md` describe una versión anterior del proyecto (Postgres 16, credenciales `admin/admin1234`, carpeta `frontend/src/iteraciones/`) que ya no coincide con el código actual.
