@@ -1,40 +1,53 @@
+<div align="center">
+
 # 🏟️ Sistema de Reservas — Complejo Deportivo
 
-Aplicación web para administrar un complejo deportivo: reserva de canchas, pagos con comprobante, eventos con inscripción de cupo limitado y reportes para administración.
+**Aplicación web para administrar un complejo deportivo:** reserva de canchas, pagos con comprobante, eventos con inscripción de cupo limitado y reportes para administración.
 
-## Índice
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-- [Stack tecnológico](#stack-tecnológico)
-- [Estructura del proyecto](#estructura-del-proyecto)
-- [Cómo iniciar el proyecto](#cómo-iniciar-el-proyecto)
-- [Usuarios de prueba](#usuarios-de-prueba)
-- [Servicios implementados](#servicios-implementados)
-- [Arquitectura y flujo de comunicación](#arquitectura-y-flujo-de-comunicación)
-- [Comandos útiles](#comandos-útiles)
-- [Notas y pendientes conocidos](#notas-y-pendientes-conocidos)
+</div>
 
-## Stack tecnológico
+---
 
-**Backend** (`backend/`)
-- Node.js 20 + Express 4, en TypeScript
-- PostgreSQL vía `pg` — SQL puro, sin ORM
-- JWT (`jsonwebtoken`) + `bcrypt` para autenticación
-- `multer` para subir fotos de perfil y comprobantes de pago
-- `nodemailer` (Gmail SMTP) para el correo de recuperación de contraseña
+## 📚 Tabla de Contenidos
 
-**Frontend** (`frontend/`)
-- React 18 + Vite + TypeScript
-- React Router 7
-- Axios como cliente HTTP
-- Tailwind CSS
-- `@nivo/heatmap` y `@nivo/pie` para las gráficas de reportes
-- `jspdf`, `html2canvas` y `xlsx` para exportar reportes
+- 🧱 [Stack Tecnológico](#-stack-tecnológico)
+- 📁 [Estructura del Proyecto](#-estructura-del-proyecto)
+- 🚀 [Puesta en Marcha](#-puesta-en-marcha)
+- 🔑 [Usuarios de Prueba](#-usuarios-de-prueba)
+- 🧩 [Servicios Implementados](#-servicios-implementados)
+- 🔄 [Arquitectura y Flujo de Comunicación](#-arquitectura-y-flujo-de-comunicación)
+- 🛠️ [Comandos Útiles](#-comandos-útiles)
+- 📌 [Notas y Pendientes Conocidos](#-notas-y-pendientes-conocidos)
 
-**Infraestructura**
-- PostgreSQL 15 (`postgres:15-alpine`) + pgAdmin 4
-- Docker Compose orquesta los 4 servicios: base de datos, pgAdmin, backend y frontend
+---
 
-## Estructura del proyecto
+## 🧱 Stack Tecnológico
+
+| Capa | Tecnología |
+|---|---|
+| **Backend** | Node.js 20 · Express 4 · TypeScript |
+| **Base de datos** | PostgreSQL 15 vía `pg` (SQL puro, sin ORM) |
+| **Autenticación** | JWT (`jsonwebtoken`) + `bcrypt` |
+| **Archivos** | `multer` (fotos de perfil y comprobantes) |
+| **Correo** | `nodemailer` (Gmail SMTP) |
+| **Frontend** | React 18 · Vite · TypeScript |
+| **Ruteo** | React Router 7 |
+| **Cliente HTTP** | Axios |
+| **Estilos** | Tailwind CSS |
+| **Gráficas** | `@nivo/heatmap` · `@nivo/pie` |
+| **Exportación** | `jsPDF` · `html2canvas` · `xlsx` |
+| **Infraestructura** | Docker Compose · pgAdmin 4 |
+
+---
+
+## 📁 Estructura del Proyecto
 
 ```text
 Sistema de Reservas Complejo deportivo/
@@ -43,7 +56,7 @@ Sistema de Reservas Complejo deportivo/
 │   ├── 01_schema.sql        # Tablas, relaciones y restricciones
 │   └── 02_inserts.sql       # Datos de prueba (seeders)
 ├── backend/
-│   ├── .env
+│   ├── .env                 # No incluido — se crea localmente
 │   ├── Dockerfile
 │   ├── uploads/
 │   │   ├── perfiles/        # Fotos de perfil
@@ -71,11 +84,13 @@ Sistema de Reservas Complejo deportivo/
         └── pages/               # Login, Dashboard, Reportes, etc.
 ```
 
-Cada módulo del backend sigue el mismo patrón: `routes → controllers → (services) → models`. Solo **canchas** y **reservas** tienen una capa `services` explícita; el resto llama al modelo directamente desde el controlador.
+> Cada módulo del backend sigue el mismo patrón: `routes → controllers → (services) → models`. Solo **canchas** y **reservas** tienen una capa `services` explícita; el resto llama al modelo directamente desde el controlador.
 
-## Cómo iniciar el proyecto
+---
 
-### Requisitos
+## 🚀 Puesta en Marcha
+
+### Requisitos previos
 
 | Herramienta | Versión |
 |---|---|
@@ -83,44 +98,17 @@ Cada módulo del backend sigue el mismo patrón: `routes → controllers → (se
 | Docker Desktop | última estable |
 | Git | cualquiera |
 
-### Opción A — Todo con Docker
+### 1️⃣ Clonar el repositorio
 
 ```bash
 git clone https://github.com/Roberto-Carlos01/Sistema-de-Reservas---Complejo-deportivo-.git
 cd Sistema-de-Reservas---Complejo-deportivo-
-docker compose up -d --build
 ```
 
-Levanta los 4 contenedores. La base de datos se siembra sola con `database/01_schema.sql` y `02_inserts.sql`, pero **solo la primera vez** que se crea el volumen (`docker compose down -v` para reiniciarla desde cero).
+### 2️⃣ Crear las variables de entorno
 
-### Opción B — Modo desarrollo (recomendado para programar)
-
-```bash
-# 1. Solo la base de datos
-docker compose up -d db
-
-# 1.1. Solo la base de datos y pgadmin(version web)
-docker compose up -d db pgadmin
-
-# 2. Backend (nueva terminal)
-cd backend
-npm install
-npm run dev
-
-# 3. Frontend (otra terminal)
-cd frontend
-npm install
-npm run dev
-```
-
-| Servicio | URL |
-|---|---|
-| Frontend | http://localhost:5173 |
-| Backend API | http://localhost:4000 |
-| Health check | http://localhost:4000/api/health |
-| pgAdmin | http://localhost:5050 |
-
-`backend/.env` este archivo telo tienes que generar (solo la base de datos esta ahi porque es un ejemplo)
+> [!IMPORTANT]
+> El archivo `backend/.env` **no viene incluido en el repositorio** — debes crearlo tú mismo dentro de `backend/`. Los valores de la base de datos ya sirven como ejemplo para Docker; completa tu propio `JWT_SECRET` y tus credenciales de Gmail.
 
 ```env
 PORT=4000
@@ -138,7 +126,56 @@ EMAIL_PASS=<contraseña de aplicación de Gmail>
 FRONTEND_URL=http://localhost:5173
 ```
 
-## 🔑 Usuarios de prueba
+### 3️⃣ Levantar el proyecto
+
+<details>
+<summary><b>Opción A — Todo con Docker</b></summary>
+
+```bash
+docker compose up -d --build
+```
+
+Levanta los 4 contenedores. La base de datos se siembra sola con `database/01_schema.sql` y `02_inserts.sql`, pero **solo la primera vez** que se crea el volumen (`docker compose down -v` para reiniciarla desde cero).
+
+</details>
+
+<details>
+<summary><b>Opción B — Modo desarrollo</b> (recomendado para programar)</summary>
+
+```bash
+# Solo la base de datos
+docker compose up -d db
+
+# Base de datos + pgAdmin (interfaz web)
+docker compose up -d db pgadmin
+```
+
+```bash
+# Backend (nueva terminal)
+cd backend
+npm install
+npm run dev
+```
+
+```bash
+# Frontend (otra terminal)
+cd frontend
+npm install
+npm run dev
+```
+
+</details>
+
+| Servicio | URL |
+|---|---|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:4000 |
+| Health check | http://localhost:4000/api/health |
+| pgAdmin | http://localhost:5050 |
+
+---
+
+## 🔑 Usuarios de Prueba
 
 | Email                           | Contraseña | Rol           |
 | ------------------------------- | ---------- | ------------- |
@@ -147,41 +184,36 @@ FRONTEND_URL=http://localhost:5173
 | `ana.torrez@canchasbo.com`      | `Passw123` | Empleado      |
 | `maria.lopez@gmail.com`         | `Passw123` | Cliente       |
 
-## Servicios implementados
+---
 
-**Autenticación** (`/api/auth`) — Registro público de clientes, login con JWT (expira a los 15 min) y recuperación de contraseña por correo con token temporal.
+## 🧩 Servicios Implementados
 
-**Usuarios** (`/api/usuarios`) — Perfil propio (ver/editar, con foto) y, desde el panel de administración, listado, creación, edición, cambio de estado (activo/inactivo) y eliminación de usuarios con rol Cliente, Empleado o Admin.
+| Módulo | Endpoint | Descripción |
+|---|---|---|
+| 🔐 Autenticación | `/api/auth` | Registro público de clientes, login con JWT (expira en 15 min) y recuperación de contraseña por correo con token temporal. |
+| 👤 Usuarios | `/api/usuarios` | Perfil propio (con foto) y, desde el panel admin, listado, creación, edición, cambio de estado y eliminación de usuarios. |
+| 🏟️ Canchas | `/api/canchas` | CRUD de canchas (crear/editar/eliminar restringido a administradores) y consulta de reservas por cancha para calcular disponibilidad. |
+| 📅 Reservas | `/api/reservas` | Valida que el horario no se solape. Reservas en línea quedan `pendiente`; presenciales, `confirmada`. El cliente cancela solo con +24h de anticipación; solo un admin modifica. |
+| 💳 Pagos | `/api/pagos` | Presencial, tarjeta de débito, crédito o QR. Monto = precio por hora × horas. Métodos virtuales exigen comprobante y quedan `pendiente_verificacion` hasta ser aprobados o rechazados. |
+| 🎉 Eventos | `/api/eventos` | Admin y empleados crean, editan, reprograman y cancelan eventos. Los clientes se inscriben respetando el cupo, con transacciones SQL. |
+| 📊 Reportes | `/api/reportes` | Solo administradores. Pagos por estado/método, mapa de calor de ocupación, horas ocupadas, mayor demanda, rentabilidad de servicios y comportamiento de usuarios. |
 
-**Canchas** (`/api/canchas`) — CRUD de canchas (crear/editar/eliminar restringido a administradores) y consulta de reservas por cancha para calcular disponibilidad.
+---
 
-**Reservas** (`/api/reservas`) — Creación validando que el horario no se solape con otra reserva. Las reservas en línea quedan `pendiente`; las presenciales (cargadas por un empleado) quedan `confirmada`. El cliente solo puede cancelar con más de 24 horas de anticipación; solo un administrador puede modificar fecha, hora o cancha de una reserva existente.
+## 🔄 Arquitectura y Flujo de Comunicación
 
-**Pagos** (`/api/pagos`) — Métodos: presencial, tarjeta de débito, tarjeta de crédito y QR. El monto es precio por hora × horas reservadas. Los métodos virtuales exigen comprobante (imagen o PDF, máx. 5 MB) y quedan `pendiente_verificacion` hasta que un empleado o admin lo aprueba o rechaza. Incluye historial y reintento tras un rechazo.
-
-**Eventos** (`/api/eventos`) — Administradores y empleados crean, editan, reprograman y cancelan eventos (con cancha y servicios contratados). Los clientes se inscriben respetando el cupo máximo; la inscripción y su cancelación usan transacciones SQL para mantener el cupo consistente.
-
-**Reportes** (`/api/reportes`, solo administradores) — Pagos por estado y por método, mapa de calor de ocupación, total de reservas, horas ocupadas, horarios de mayor demanda, rentabilidad de servicios contratados en eventos y comportamiento de usuarios.
-
-## Arquitectura y flujo de comunicación
-
-```text
-Navegador
-   │  http://localhost:5173
-   ▼
-Frontend (React + Vite)
-   │  Axios → /api/...   (header Authorization: Bearer <token>)
-   ▼
-Backend (Express :4000)
-   routes → controllers → services → models
-   │  pool.query(...)
-   ▼
-PostgreSQL (Docker :5432)
+```mermaid
+flowchart TD
+    A[Navegador] --> B[Frontend<br/>React + Vite :5173]
+    B -->|Axios · Bearer token| C[Backend<br/>Express :4000]
+    C -->|routes → controllers → services → models| D[(PostgreSQL<br/>Docker :5432)]
 ```
 
 La sesión se guarda como JWT en `localStorage`. El frontend cierra sesión automáticamente a los 15 minutos de inactividad, y también ante cualquier respuesta `401`/`403` del backend.
 
-## Comandos útiles
+---
+
+## 🛠️ Comandos Útiles
 
 ```bash
 # Logs de la base de datos
@@ -195,10 +227,23 @@ docker compose up -d
 docker compose up -d --build backend
 ```
 
-## Notas y pendientes conocidos
+---
+
+## 📌 Notas y Pendientes Conocidos
+
+> [!WARNING]
+> Puntos a revisar antes de llevar el proyecto a producción.
 
 - **Permisos en `/api/usuarios`:** listar, crear, editar, cambiar estado y eliminar usuarios solo exigen un token válido; falta el middleware `esAdmin` para restringirlos a administradores.
 - **`modo_demo` en pagos:** `POST /api/pagos/procesar` acepta un flag `modo_demo` que marca el pago como `pagado` sin comprobante. Solo se desactiva si `NODE_ENV=production`, variable que hoy no está definida ni en `compose.yaml` ni en ningún `.env`.
 - **Extras de reserva** (balón, arbitraje, iluminación) se guardan solo en el `localStorage` del navegador; las tablas `utilidad` y `reserva_utilidad` existen en el esquema pero el backend todavía no las usa.
-- **Secretos versionados:** `backend/.env` y `credenciales.txt` incluyen credenciales reales, entre ellas una contraseña de aplicación de Gmail. Si el repositorio es público, conviene rotarlas y dejar solo un `.env.example` con valores ficticios.
+- **Secretos versionados:** `credenciales.txt` y cualquier `.env` que llegues a subir por error pueden incluir credenciales reales, entre ellas una contraseña de aplicación de Gmail. Si el repositorio es público, conviene rotarlas.
 - `manual_inicio.md` describe una versión anterior del proyecto (Postgres 16, credenciales `admin/admin1234`, carpeta `frontend/src/iteraciones/`) que ya no coincide con el código actual.
+
+---
+
+<div align="center">
+
+⬆️ [Volver arriba](#-sistema-de-reservas--complejo-deportivo)
+
+</div>
