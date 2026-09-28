@@ -120,7 +120,7 @@ npm run dev
 | Health check | http://localhost:4000/api/health |
 | pgAdmin | http://localhost:5050 |
 
-`backend/.env` ya viene incluido con valores de desarrollo; verifica que coincidan con `compose.yaml`:
+`backend/.env` este archivo telo tienes que generar (solo la base de datos esta ahi porque es un ejemplo)
 
 ```env
 PORT=4000
