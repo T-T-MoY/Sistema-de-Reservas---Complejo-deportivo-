@@ -99,6 +99,9 @@ Levanta los 4 contenedores. La base de datos se siembra sola con `database/01_sc
 # 1. Solo la base de datos
 docker compose up -d db
 
+# 1.1. Solo la base de datos y pgadmin(version web)
+docker compose up -d db pgadmin
+
 # 2. Backend (nueva terminal)
 cd backend
 npm install
