@@ -108,7 +108,10 @@ cd Sistema-de-Reservas---Complejo-deportivo-
 ### 2️⃣ Crear las variables de entorno
 
 > [!IMPORTANT]
-> El archivo `backend/.env` **no viene incluido en el repositorio** — debes crearlo tú mismo dentro de `backend/`. Los valores de la base de datos ya sirven como ejemplo para Docker; completa tu propio `JWT_SECRET` y tus credenciales de Gmail.
+> El archivo `backend/.env` **no viene incluido en el repositorio** — debes crearlo tú mismo dentro de `backend/`. Los valores de la base de datos ya sirven como ejemplo para Docker; completa tu propio `JWT_SECRET` y tus credenciales de Gmail para el correo de recuperación de contraseñas.
+
+> [!IMPORTANT]
+> La cuenta de Gmail que uses para el correo de recuperación **debe tener sí o sí la verificación en dos pasos activada**, y usar la **contraseña de aplicación** (no tu contraseña normal de Gmail — son diferentes).
 
 ```env
 PORT=4000
