@@ -75,9 +75,116 @@ export interface ReporteComportamientoData {
 }
 
 // =====================================================
+// USUARIOS (reporte admin)
+// =====================================================
+export interface UsuarioReporte {
+  id_usuario: number;
+  nombre_completo: string;
+  correo: string;
+  telefono: string;
+  estado_cuenta: string;
+  fecha_registro: string;
+  tipo_usuario: string;
+}
+
+export interface DistribucionUsuarios {
+  tipo_usuario: string;
+  cantidad: number;
+}
+
+export interface ReporteUsuariosData {
+  usuarios: UsuarioReporte[];
+  distribucion: DistribucionUsuarios[];
+}
+
+export interface FiltrosReporteUsuarios {
+  fechaInicio: string;
+  fechaFin: string;
+  tipoUsuario: string;
+  estado: string;
+  busqueda: string;
+}
+
+// =====================================================
+// EVENTOS Y SERVICIOS (reporte admin)
+// =====================================================
+export interface EventoServicioItem {
+  id_evento: number;
+  nombre_evento: string;
+  tipo_evento: string;
+  fecha_evento: string;
+  hora_inicio: string;
+  hora_fin: string;
+  canchas: string;
+  servicios: string;
+  cupo_maximo: number;
+  estado: string;
+}
+
+export interface ServicioIngreso {
+  id: string;
+  label: string;
+  value: number;
+}
+
+export interface ReporteEventosServiciosData {
+  eventos: EventoServicioItem[];
+  ingresosServicios: ServicioIngreso[];
+}
+
+// =====================================================
+// PAGOS — DETALLES (tabla)
+// =====================================================
+export interface DetallePagoItem {
+  fecha: string;
+  concepto: string;
+  monto: number;
+  metodo: string;
+  estado: string;
+}
+
+// =====================================================
+// HISTORIAL CLIENTE — RESERVAS
+// =====================================================
+export interface ReservaHistorial {
+  id_reserva: number;
+  cancha: string;
+  disciplina: string | null;
+  hora_inicio: string;
+  hora_fin: string;
+  estado_reserva: string;
+  monto: number | null;
+  estado_pago: string | null;
+}
+
+// =====================================================
+// HISTORIAL CLIENTE — INSCRIPCIONES
+// =====================================================
+export interface InscripcionHistorial {
+  id_inscripcion: number;
+  id_evento: number;
+  nombre_evento: string;
+  descripcion: string | null;
+  hora_inicio: string;
+  hora_fin: string;
+  tipo_evento: string | null;
+  fecha_inscripcion: string;
+  estado_inscripcion: string;
+  estado_evento: string;
+}
+
+// =====================================================
 // TABS
 // =====================================================
-export type ReporteTab = 'ocupacion' | 'finanzas' | 'rentabilidad' | 'usuarios';
+export type ReporteTab =
+  | 'ocupacion'
+  | 'finanzas'
+  | 'rentabilidad'
+  | 'usuarios'
+  | 'canchas'
+  | 'eventos-servicios';
+
+export type ReporteTabCliente = 'reservas' | 'inscripciones';
 
 // =====================================================
 // PROPS COMUNES

@@ -18,6 +18,8 @@ export type NivelAcceso = 'Total' | 'Medio' | 'Bajo';
 // =====================================================
 export interface Usuario {
   id: number;
+  id_usuario?: number;
+  _id?: string | number;
   nombre?: string;
   apellidos?: string;
   paterno?: string;
@@ -75,3 +77,40 @@ export interface UsuarioListProps {
   title?: string;
   subtitle?: string;
 }
+
+// =====================================================
+// HELPERS COMPARTIDOS (usados por List, Card y Modal)
+// =====================================================
+export const obtenerId = (u: Usuario): number | string | undefined => {
+  return u.id ?? u.id_usuario ?? u._id;
+};
+
+export const getNombreCompleto = (u: Usuario): string => {
+  const nombre = u.nombre || '';
+  const apellidos =
+    u.apellidos || [u.paterno, u.materno].filter(Boolean).join(' ');
+  return `${nombre} ${apellidos}`.trim() || 'Sin nombre';
+};
+
+export const getIniciales = (u: Usuario): string => {
+  const n = u.nombre?.charAt(0) || '';
+  const a = u.apellidos?.charAt(0) || u.paterno?.charAt(0) || '';
+  return (n + a).toUpperCase() || '?';
+};
+
+export const getEstadoRaw = (u: Usuario): string => {
+  return (u.estado || u.estado_cuenta || 'Activo').toString().trim();
+};
+
+export const getEstado = (u: Usuario): string => {
+  const raw = getEstadoRaw(u);
+  const lower = raw.toLowerCase();
+  if (lower === 'activo') return 'Activo';
+  if (lower === 'inactivo') return 'Inactivo';
+  return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+};
+
+export const esActivo = (u: Usuario): boolean => {
+  const est = getEstadoRaw(u).toLowerCase();
+  return est === 'activo' || est === 'active' || est === 'habilitado';
+};

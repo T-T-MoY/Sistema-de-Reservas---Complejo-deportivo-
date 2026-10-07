@@ -6,6 +6,13 @@
  */
 
 import type { Usuario } from './usuario.types';
+import {
+  obtenerId,
+  getNombreCompleto,
+  getIniciales,
+  getEstado,
+  esActivo,
+} from './usuario.types';
 
 interface UsuarioCardProps {
   usuario: Usuario;
@@ -13,29 +20,10 @@ interface UsuarioCardProps {
   onDelete: (id: number) => void;
 }
 
-// =====================================================
-// HELPERS
-// =====================================================
-const getNombreCompleto = (u: Usuario): string => {
-  const nombre = u.nombre || '';
-  const apellidos = u.apellidos || [u.paterno, u.materno].filter(Boolean).join(' ');
-  return `${nombre} ${apellidos}`.trim() || 'Sin nombre';
-};
-
-const getIniciales = (u: Usuario): string => {
-  const n = u.nombre?.charAt(0) || '';
-  const a = (u.apellidos?.charAt(0) || u.paterno?.charAt(0)) || '';
-  return (n + a).toUpperCase() || '?';
-};
-
-const getEstado = (u: Usuario): string => u.estado || u.estado_cuenta || 'Activo';
-
-// =====================================================
-// COMPONENTE
-// =====================================================
 export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => {
   const estado = getEstado(usuario);
-  const isActivo = estado === 'Activo';
+  const activo = esActivo(usuario);
+  const id = obtenerId(usuario);
 
   return (
     <div className="bg-claro-tarjeta dark:bg-oscuro-tarjeta border border-claro-borde dark:border-oscuro-borde rounded-2xl p-5 hover:shadow-lg transition-shadow">
@@ -45,10 +33,16 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
           {getIniciales(usuario)}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-claro-texto dark:text-oscuro-texto truncate">
+          <h3
+            className="font-semibold text-claro-texto dark:text-oscuro-texto truncate"
+            title={getNombreCompleto(usuario)}
+          >
             {getNombreCompleto(usuario)}
           </h3>
-          <p className="text-xs text-claro-texto2 dark:text-oscuro-texto2 truncate">
+          <p
+            className="text-xs text-claro-texto2 dark:text-oscuro-texto2 truncate"
+            title={usuario.correo}
+          >
             {usuario.correo || 'sin correo'}
           </p>
         </div>
@@ -56,11 +50,14 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
 
       {/* Rol + Estado */}
       <div className="grid grid-cols-2 gap-3 text-xs mb-4">
-        <div>
+        <div className="min-w-0">
           <p className="text-claro-texto2 dark:text-oscuro-texto2 uppercase tracking-wide mb-1">
             Rol
           </p>
-          <p className="font-medium text-claro-texto dark:text-oscuro-texto">
+          <p
+            className="font-medium text-claro-texto dark:text-oscuro-texto truncate"
+            title={usuario.rol}
+          >
             {usuario.rol || '—'}
           </p>
         </div>
@@ -69,12 +66,17 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
             Estado
           </p>
           <span
-            className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${
-              isActivo
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${
+              activo
                 ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
                 : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
             }`}
           >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                activo ? 'bg-green-500' : 'bg-red-500'
+              }`}
+            />
             {estado}
           </span>
         </div>
@@ -91,7 +93,7 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
         </button>
         <button
           type="button"
-          onClick={() => onDelete(usuario.id)}
+          onClick={() => id !== undefined && onDelete(Number(id))}
           className="flex-1 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-claro-fondo dark:bg-oscuro-fondo border border-claro-borde dark:border-oscuro-borde rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
         >
           Eliminar

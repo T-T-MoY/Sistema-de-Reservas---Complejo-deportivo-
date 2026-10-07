@@ -2,6 +2,7 @@
  * ============================================================================
  * ARCHIVO: ReportesComportamiento.tsx
  * COMPONENTE: Reporte de comportamiento de usuarios (VIP + métricas).
+ * Estilos con tokens del sistema (claro-* / oscuro-*).
  * ============================================================================
  */
 
@@ -90,20 +91,24 @@ export const ReporteComportamiento: React.FC<Props> = ({ fechaInicio, fechaFin }
       {/* ============================================================
           BARRA DE BOTONES DE EXPORTACIÓN
           ============================================================ */}
-      <div className="flex justify-between items-center bg-claro-tarjeta dark:bg-oscuro-tarjeta p-5 rounded-2xl border border-claro-borde dark:border-oscuro-borde shadow-sm transition-colors">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-claro-tarjeta dark:bg-oscuro-tarjeta p-5 rounded-2xl border border-claro-borde dark:border-oscuro-borde shadow-sm transition-colors">
         <h2 className="text-xl font-bold text-claro-texto dark:text-oscuro-texto">
           Reporte de Comportamiento
         </h2>
-        <div className="space-x-3">
+
+        <div className="flex gap-3">
           <button
             onClick={exportarExcel}
-            className="px-4 py-2 bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:hover:bg-oscuro-hover text-white dark:text-oscuro-fondo font-medium rounded-xl text-sm transition-colors shadow-sm"
+            disabled={data.clientesVip.length === 0}
+            className="px-4 py-2 bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:hover:bg-oscuro-hover text-white dark:text-oscuro-fondo font-medium rounded-xl text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Exportar Excel
           </button>
+
           <button
             onClick={exportarPDF}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white font-medium rounded-xl text-sm transition-colors shadow-sm"
+            disabled={data.clientesVip.length === 0}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white font-medium rounded-xl text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Exportar PDF
           </button>
@@ -114,7 +119,6 @@ export const ReporteComportamiento: React.FC<Props> = ({ fechaInicio, fechaFin }
           CONTENEDOR PRINCIPAL (lo que se exporta a PDF)
           ============================================================ */}
       <div id="seccion-reporte-pdf" className="space-y-6">
-
         {/* Tarjetas de métricas */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-claro-tarjeta dark:bg-oscuro-tarjeta p-5 rounded-2xl border border-claro-borde dark:border-oscuro-borde shadow-sm transition-colors">
@@ -159,6 +163,7 @@ export const ReporteComportamiento: React.FC<Props> = ({ fechaInicio, fechaFin }
           <h3 className="text-lg font-bold text-claro-texto dark:text-oscuro-texto mb-4">
             Clientes Frecuentes (VIP)
           </h3>
+
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -169,28 +174,42 @@ export const ReporteComportamiento: React.FC<Props> = ({ fechaInicio, fechaFin }
                   <th className="py-3 px-4 text-right">Total Gastado</th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-claro-borde dark:divide-oscuro-borde">
-                {data.clientesVip.map((c) => (
-                  <tr key={c.id_cliente} className="transition-colors hover:bg-black/5 dark:hover:bg-white/5">
-                    <td className="py-3 px-4 font-medium text-claro-texto dark:text-oscuro-texto">
-                      {c.cliente}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-claro-texto2 dark:text-oscuro-texto2">
-                      {c.correo} | {c.telefono}
-                    </td>
-                    <td className="py-3 px-4 text-center font-bold text-claro-texto dark:text-oscuro-texto">
-                      {c.total_reservas}
-                    </td>
-                    <td className="py-3 px-4 text-right font-bold text-claro-texto dark:text-oscuro-texto">
-                      {Number(c.total_gastado).toFixed(2)} Bs.
+                {data.clientesVip.length > 0 ? (
+                  data.clientesVip.map((c) => (
+                    <tr
+                      key={c.id_cliente}
+                      className="transition-colors hover:bg-claro-fondo dark:hover:bg-oscuro-fondo/50"
+                    >
+                      <td className="py-3 px-4 font-medium text-claro-texto dark:text-oscuro-texto">
+                        {c.cliente}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-claro-texto2 dark:text-oscuro-texto2">
+                        {c.correo} | {c.telefono}
+                      </td>
+                      <td className="py-3 px-4 text-center font-bold text-claro-texto dark:text-oscuro-texto">
+                        {c.total_reservas}
+                      </td>
+                      <td className="py-3 px-4 text-right font-bold text-claro-texto dark:text-oscuro-texto">
+                        {Number(c.total_gastado).toFixed(2)} Bs.
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="text-center py-6 text-claro-texto2 dark:text-oscuro-texto2"
+                    >
+                      No hay clientes frecuentes en este rango de fechas.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </div>
-
       </div>
     </div>
   );

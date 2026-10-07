@@ -2,7 +2,17 @@
  * ============================================================================
  * ARCHIVO: ReportesHeatMap.tsx
  * COMPONENTE: Mapa de calor de ocupación de canchas.
- * PALETA: verde del sistema (crema → verde claro → verde → verde oscuro → oscuro)
+ *
+ * PALETA: escala de verde del sistema con 5 niveles:
+ *   0 reservas → claro-tinte   (verde muy claro)
+ *   1 reserva  → verde claro
+ *   2 reservas → verde medio (primario)
+ *   3 reservas → verde oscuro
+ *   4+         → oscuro profundo
+ *
+ * Se usa una escala fija (no depende del tema) porque el heatmap necesita
+ * mostrar gradación de intensidad, y para ello los colores deben ser
+ * consistentes en claro y oscuro.
  * ============================================================================
  */
 
@@ -15,6 +25,15 @@ interface Props {
   fechaInicio: string;
   fechaFin: string;
 }
+
+// Paleta de intensidad — coherente con los tonos verde/crema del sistema
+const PALETA_HEATMAP = {
+  nivel0: '#F1EADA', // crema claro (equivalente a claro-tinte)
+  nivel1: '#8FC7B8', // verde claro
+  nivel2: '#5DA797', // verde primario del sistema
+  nivel3: '#3B7B6D', // verde oscuro
+  nivel4: '#1C3034', // oscuro profundo (equivalente a oscuro-tarjeta)
+};
 
 export const MapaOcupacionCanchas: React.FC<Props> = ({ fechaInicio, fechaFin }) => {
   const [canchas, setCanchas] = useState<CanchaReporte[]>([]);
@@ -70,7 +89,8 @@ export const MapaOcupacionCanchas: React.FC<Props> = ({ fechaInicio, fechaFin })
     const cancha =
       canchaSeleccionada === 'todas'
         ? 'Todas las canchas'
-        : canchas.find((c) => c.id_cancha.toString() === canchaSeleccionada)?.nombre || 'Cancha seleccionada';
+        : canchas.find((c) => c.id_cancha.toString() === canchaSeleccionada)?.nombre ||
+          'Cancha seleccionada';
 
     contenido += `Cancha,${cancha}\n`;
     contenido += `Total de reservas,${totalReservas}\n`;
@@ -95,6 +115,7 @@ export const MapaOcupacionCanchas: React.FC<Props> = ({ fechaInicio, fechaFin })
 
   return (
     <div className="bg-claro-tarjeta dark:bg-oscuro-tarjeta p-5 rounded-2xl border border-claro-borde dark:border-oscuro-borde shadow-sm transition-colors">
+      {/* Cabecera */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h3 className="text-lg font-bold text-claro-texto dark:text-oscuro-texto">
@@ -114,14 +135,17 @@ export const MapaOcupacionCanchas: React.FC<Props> = ({ fechaInicio, fechaFin })
           </button>
 
           <div className="flex items-center gap-2">
-            <label htmlFor="select-cancha" className="text-xs font-medium text-claro-texto2 dark:text-oscuro-texto2">
+            <label
+              htmlFor="select-cancha"
+              className="text-xs font-medium text-claro-texto2 dark:text-oscuro-texto2"
+            >
               Cancha:
             </label>
             <select
               id="select-cancha"
               value={canchaSeleccionada}
               onChange={(e) => setCanchaSeleccionada(e.target.value)}
-              className="bg-transparent text-claro-texto dark:text-oscuro-texto text-sm px-3 py-2 rounded-xl border border-claro-borde dark:border-oscuro-borde focus:outline-none cursor-pointer"
+              className="bg-claro-fondo dark:bg-oscuro-fondo text-claro-texto dark:text-oscuro-texto text-sm px-3 py-2 rounded-xl border border-claro-borde dark:border-oscuro-borde focus:outline-none focus:ring-2 focus:ring-claro-primario/40 dark:focus:ring-oscuro-primario/40 cursor-pointer"
             >
               <option value="todas" className="bg-claro-tarjeta dark:bg-oscuro-tarjeta">
                 Todas las canchas
@@ -140,21 +164,37 @@ export const MapaOcupacionCanchas: React.FC<Props> = ({ fechaInicio, fechaFin })
         </div>
       </div>
 
+      {/* KPIs resumen */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-claro-fondo dark:bg-oscuro-fondo p-4 rounded-xl border border-claro-borde dark:border-oscuro-borde">
-          <p className="text-xs font-medium text-claro-texto2 dark:text-oscuro-texto2">Total de reservas</p>
-          <p className="text-2xl font-bold text-claro-texto dark:text-oscuro-texto mt-1">{totalReservas}</p>
+          <p className="text-xs font-medium text-claro-texto2 dark:text-oscuro-texto2">
+            Total de reservas
+          </p>
+          <p className="text-2xl font-bold text-claro-texto dark:text-oscuro-texto mt-1">
+            {totalReservas}
+          </p>
         </div>
+
         <div className="bg-claro-fondo dark:bg-oscuro-fondo p-4 rounded-xl border border-claro-borde dark:border-oscuro-borde">
-          <p className="text-xs font-medium text-claro-texto2 dark:text-oscuro-texto2">Horas ocupadas</p>
-          <p className="text-2xl font-bold text-claro-texto dark:text-oscuro-texto mt-1">{horasOcupadas}</p>
+          <p className="text-xs font-medium text-claro-texto2 dark:text-oscuro-texto2">
+            Horas ocupadas
+          </p>
+          <p className="text-2xl font-bold text-claro-texto dark:text-oscuro-texto mt-1">
+            {horasOcupadas}
+          </p>
         </div>
+
         <div className="bg-claro-fondo dark:bg-oscuro-fondo p-4 rounded-xl border border-claro-borde dark:border-oscuro-borde">
-          <p className="text-xs font-medium text-claro-texto2 dark:text-oscuro-texto2">Mayor demanda</p>
-          <p className="text-2xl font-bold text-claro-texto dark:text-oscuro-texto mt-1">{mayorDemanda}</p>
+          <p className="text-xs font-medium text-claro-texto2 dark:text-oscuro-texto2">
+            Mayor demanda
+          </p>
+          <p className="text-2xl font-bold text-claro-texto dark:text-oscuro-texto mt-1">
+            {mayorDemanda}
+          </p>
         </div>
       </div>
 
+      {/* Heatmap */}
       {cargando ? (
         <div className="h-80 flex items-center justify-center text-claro-texto2 dark:text-oscuro-texto2 text-sm">
           Cargando datos de ocupación...
@@ -176,17 +216,17 @@ export const MapaOcupacionCanchas: React.FC<Props> = ({ fechaInicio, fechaFin })
             }}
             axisLeft={{ tickSize: 5, tickPadding: 5, tickRotation: 0 }}
 
-            /* Escala de 5 niveles con paleta del sistema (función custom) */
+            /* Escala de 5 niveles con paleta del sistema */
             colors={(cell) => {
               const v = Number(cell.value ?? 0);
-              if (v <= 0) return '#F1EADA';   // 0 reservas → crema claro
-              if (v === 1) return '#8FC7B8';  // 1 reserva  → verde claro
-              if (v === 2) return '#5DA797';  // 2 reservas → verde sistema
-              if (v === 3) return '#3B7B6D';  // 3 reservas → verde oscuro
-              return '#1C3034';               // 4+         → oscuro
+              if (v <= 0) return PALETA_HEATMAP.nivel0;
+              if (v === 1) return PALETA_HEATMAP.nivel1;
+              if (v === 2) return PALETA_HEATMAP.nivel2;
+              if (v === 3) return PALETA_HEATMAP.nivel3;
+              return PALETA_HEATMAP.nivel4;
             }}
 
-            emptyColor="#F1EADA"
+            emptyColor={PALETA_HEATMAP.nivel0}
             borderRadius={3}
             borderWidth={1}
             borderColor={{ from: 'color', modifiers: [['darker', 0.1]] }}

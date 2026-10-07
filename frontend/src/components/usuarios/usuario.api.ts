@@ -21,7 +21,7 @@ export const usuarioApi = {
   /**
    * Obtiene un usuario por ID.
    */
-  getById: async (id: number): Promise<Usuario> => {
+  getById: async (id: number | string): Promise<Usuario> => {
     const res = await api.get<Usuario>(`/usuarios/${id}`);
     return res.data;
   },
@@ -37,15 +37,20 @@ export const usuarioApi = {
   /**
    * Actualiza un usuario existente.
    */
-  update: async (id: number, payload: Record<string, unknown>): Promise<Usuario> => {
+  update: async (
+    id: number | string,
+    payload: Record<string, unknown>
+  ): Promise<Usuario> => {
     const res = await api.put<Usuario>(`/usuarios/${id}`, payload);
     return res.data;
   },
 
   /**
    * Elimina un usuario.
+   * Lanza el error completo de axios para que el llamador pueda inspeccionar
+   * el status y el mensaje del backend.
    */
-  delete: async (id: number): Promise<void> => {
+  delete: async (id: number | string): Promise<void> => {
     await api.delete(`/usuarios/${id}`);
   },
 };

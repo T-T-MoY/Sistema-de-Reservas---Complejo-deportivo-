@@ -245,100 +245,257 @@ const DisponibilidadCancha = () => {
         }
     };
 
-    if (cargando) return <div className="p-8 text-center">Cargando cancha y disponibilidad...</div>;
-    if (!cancha) return <div className="p-8 text-center">No se encontró la cancha.</div>;
+    if (cargando) {
+        return (
+            <div className="mx-auto max-w-6xl p-8 text-center text-claro-texto2 dark:text-oscuro-texto2">
+                Cargando cancha y disponibilidad...
+            </div>
+        );
+    }
+    if (!cancha) {
+        return (
+            <div className="mx-auto max-w-6xl p-8 text-center text-claro-texto2 dark:text-oscuro-texto2">
+                No se encontró la cancha.
+            </div>
+        );
+    }
 
     const nombreMes = mes.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
 
     return (
         <div className="mx-auto max-w-6xl space-y-6 pb-8">
-            <button type="button" onClick={() => navigate('/canchas')} className="inline-flex items-center gap-2 text-sm font-semibold text-claro-primario transition hover:gap-3">← Volver a canchas</button>
-            <header className="overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950 p-6 text-white shadow-xl md:p-8">
+            {/* Botón volver */}
+            <button
+                type="button"
+                onClick={() => navigate('/canchas')}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-claro-primario dark:text-oscuro-primario transition hover:gap-3"
+            >
+                ← Volver a canchas
+            </button>
+
+            {/* ============================================ */}
+            {/* HEADER DE LA CANCHA — con tokens del sistema   */}
+            {/* ============================================ */}
+            <header className="overflow-hidden rounded-3xl p-6 shadow-xl md:p-8 bg-oscuro-tarjeta dark:bg-oscuro-tarjeta bg-gradient-to-br from-oscuro-fondo via-oscuro-tarjeta to-oscuro-tinte text-white">
                 <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
                     <div>
-                        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">Reserva en línea · disponibilidad en vivo</p>
-                        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{cancha.nombre}</h1>
-                        <p className="mt-2 text-slate-300">{cancha.disciplina} · {cancha.ubicacion || 'Sector principal'}</p>
+                        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-oscuro-primario">
+                            Reserva en línea · disponibilidad en vivo
+                        </p>
+                        <h1 className="text-3xl font-bold tracking-tight md:text-4xl text-white">
+                            {cancha.nombre}
+                        </h1>
+                        <p className="mt-2 text-oscuro-texto2">
+                            {cancha.disciplina} · {cancha.ubicacion || 'Sector principal'}
+                        </p>
                     </div>
-                    <div className="rounded-2xl border border-white/15 bg-white/10 px-5 py-4 backdrop-blur">
-                        <p className="text-xs uppercase tracking-wider text-slate-300">Tarifa</p>
-                        <p className="mt-1 text-2xl font-bold">Bs. {Number(cancha.precio_hora).toFixed(2)} <span className="text-sm font-normal text-slate-300">/ hora</span></p>
+                    <div className="rounded-2xl border border-oscuro-borde bg-oscuro-fondo/40 px-5 py-4 backdrop-blur">
+                        <p className="text-xs uppercase tracking-wider text-oscuro-texto2">Tarifa</p>
+                        <p className="mt-1 text-2xl font-bold text-white">
+                            Bs. {Number(cancha.precio_hora).toFixed(2)}{' '}
+                            <span className="text-sm font-normal text-oscuro-texto2">/ hora</span>
+                        </p>
                     </div>
                 </div>
             </header>
 
-            {error && <div className="rounded-lg bg-red-100 p-3 text-sm text-red-700">{error}</div>}
+            {error && (
+                <div className="rounded-lg p-3 text-sm font-medium bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
+                    {error}
+                </div>
+            )}
 
             <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-                <section className="rounded-3xl border border-claro-borde bg-claro-tarjeta p-5 shadow-sm dark:bg-oscuro-tarjeta md:p-6">
+                {/* ============================================ */}
+                {/* CALENDARIO                                     */}
+                {/* ============================================ */}
+                <section className="rounded-3xl border border-claro-borde dark:border-oscuro-borde bg-claro-tarjeta dark:bg-oscuro-tarjeta p-5 shadow-sm md:p-6 transition-colors">
                     <div className="mb-4 flex items-center justify-between">
-                        <button type="button" onClick={() => cambiarMes(-1)} className="rounded-lg border border-claro-borde px-3 py-2" aria-label="Mes anterior">←</button>
-                        <h2 className="text-lg font-semibold capitalize text-claro-texto dark:text-oscuro-texto">{nombreMes}</h2>
-                        <button type="button" onClick={() => cambiarMes(1)} className="rounded-lg border border-claro-borde px-3 py-2" aria-label="Mes siguiente">→</button>
+                        <button
+                            type="button"
+                            onClick={() => cambiarMes(-1)}
+                            aria-label="Mes anterior"
+                            className="rounded-lg border border-claro-borde dark:border-oscuro-borde bg-claro-tarjeta dark:bg-oscuro-tarjeta px-3 py-2 text-claro-texto dark:text-oscuro-texto hover:border-claro-primario dark:hover:border-oscuro-primario transition-colors"
+                        >
+                            ←
+                        </button>
+                        <h2 className="text-lg font-semibold capitalize text-claro-texto dark:text-oscuro-texto">
+                            {nombreMes}
+                        </h2>
+                        <button
+                            type="button"
+                            onClick={() => cambiarMes(1)}
+                            aria-label="Mes siguiente"
+                            className="rounded-lg border border-claro-borde dark:border-oscuro-borde bg-claro-tarjeta dark:bg-oscuro-tarjeta px-3 py-2 text-claro-texto dark:text-oscuro-texto hover:border-claro-primario dark:hover:border-oscuro-primario transition-colors"
+                        >
+                            →
+                        </button>
                     </div>
-                    <div className="mb-2 grid grid-cols-7 text-center text-xs font-semibold uppercase text-claro-texto2">
-                        {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia) => <span key={dia} className="p-2">{dia}</span>)}
+
+                    <div className="mb-2 grid grid-cols-7 text-center text-xs font-semibold uppercase text-claro-texto2 dark:text-oscuro-texto2">
+                        {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia) => (
+                            <span key={dia} className="p-2">{dia}</span>
+                        ))}
                     </div>
+
                     <div className="grid grid-cols-7 gap-1">
                         {diasCalendario.map((dia, indice) => {
                             if (!dia) return <span key={`vacio-${indice}`} className="min-h-16" />;
                             const clave = fechaClave(dia);
                             const cantidad = reservasPorDia[clave] || 0;
                             const pasado = clave < hoy;
+                            const esSeleccionado = fechaSeleccionada === clave;
                             return (
-                                <button key={clave} type="button" disabled={pasado} onClick={() => setFechaSeleccionada(clave)} className={`min-h-16 rounded-lg border p-2 text-left ${fechaSeleccionada === clave ? 'border-claro-primario bg-claro-primario/10' : 'border-claro-borde'} ${pasado ? 'cursor-not-allowed opacity-40' : 'hover:border-claro-primario'}`}>
-                                    <span className="text-sm font-semibold text-claro-texto dark:text-oscuro-texto">{dia.getDate()}</span>
-                                    <span className={`mt-2 block text-xs ${cantidad ? 'text-red-600' : 'text-green-600'}`}>{cantidad ? `● ${cantidad} reserv.` : '● Libre'}</span>
+                                <button
+                                    key={clave}
+                                    type="button"
+                                    disabled={pasado}
+                                    onClick={() => setFechaSeleccionada(clave)}
+                                    className={`min-h-16 rounded-lg border p-2 text-left transition-colors
+                                        ${esSeleccionado
+                                            ? 'border-claro-primario dark:border-oscuro-primario bg-claro-primario/10 dark:bg-oscuro-primario/10'
+                                            : 'border-claro-borde dark:border-oscuro-borde bg-claro-tarjeta dark:bg-oscuro-tarjeta hover:border-claro-primario dark:hover:border-oscuro-primario'
+                                        }
+                                        ${pasado ? 'cursor-not-allowed opacity-40' : ''}`}
+                                >
+                                    <span className="text-sm font-semibold text-claro-texto dark:text-oscuro-texto">
+                                        {dia.getDate()}
+                                    </span>
+                                    <span
+                                        className={`mt-2 block text-xs font-medium ${
+                                            cantidad
+                                                ? 'text-red-600 dark:text-red-400'
+                                                : 'text-green-600 dark:text-green-400'
+                                        }`}
+                                    >
+                                        {cantidad ? `● ${cantidad} reserv.` : '● Libre'}
+                                    </span>
                                 </button>
                             );
                         })}
                     </div>
                 </section>
 
-                <section className="rounded-3xl border border-claro-borde bg-claro-tarjeta p-5 shadow-sm dark:bg-oscuro-tarjeta md:p-6">
+                {/* ============================================ */}
+                {/* PANEL DE HORARIOS                             */}
+                {/* ============================================ */}
+                <section className="rounded-3xl border border-claro-borde dark:border-oscuro-borde bg-claro-tarjeta dark:bg-oscuro-tarjeta p-5 shadow-sm md:p-6 transition-colors">
                     <div className="flex items-start justify-between gap-3">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-claro-primario">Paso 1 · Horario</p>
-                            <h2 className="mt-1 text-lg font-semibold text-claro-texto dark:text-oscuro-texto">Elige hasta 3 horas seguidas</h2>
-                            <p className="mt-1 text-sm text-claro-texto2">{new Date(`${fechaSeleccionada}T12:00:00`).toLocaleDateString('es-ES')}</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-claro-primario dark:text-oscuro-primario">
+                                Paso 1 · Horario
+                            </p>
+                            <h2 className="mt-1 text-lg font-semibold text-claro-texto dark:text-oscuro-texto">
+                                Elige hasta 3 horas seguidas
+                            </h2>
+                            <p className="mt-1 text-sm text-claro-texto2 dark:text-oscuro-texto2">
+                                {new Date(`${fechaSeleccionada}T12:00:00`).toLocaleDateString('es-ES')}
+                            </p>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="rounded-full bg-claro-primario/10 px-3 py-1 text-xs font-semibold text-claro-primario">{horasSeleccionadas.length}/3 horas</span>
-                            {horasSeleccionadas.length > 0 && <button type="button" onClick={() => { setHorasSeleccionadas([]); setMensajeHorario(''); }} className="text-xs font-semibold text-claro-texto2 underline decoration-dotted underline-offset-2 hover:text-claro-primario">Limpiar</button>}
+                            <span className="rounded-full bg-claro-primario/10 dark:bg-oscuro-primario/10 px-3 py-1 text-xs font-semibold text-claro-primario dark:text-oscuro-primario">
+                                {horasSeleccionadas.length}/3 horas
+                            </span>
+                            {horasSeleccionadas.length > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={() => { setHorasSeleccionadas([]); setMensajeHorario(''); }}
+                                    className="text-xs font-semibold text-claro-texto2 dark:text-oscuro-texto2 underline decoration-dotted underline-offset-2 hover:text-claro-primario dark:hover:text-oscuro-primario"
+                                >
+                                    Limpiar
+                                </button>
+                            )}
                         </div>
                     </div>
+
                     <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
                         {HORARIOS.map(([inicio, fin], indice) => {
                             const ocupado = estaOcupado(inicio, fin);
                             const seleccionado = horasSeleccionadas.includes(indice);
-                            return <button key={inicio} type="button" disabled={ocupado} onClick={() => seleccionarHorario(indice)} className={`group flex w-full items-center justify-between rounded-xl border p-3 text-left transition ${ocupado ? 'cursor-not-allowed border-red-200 bg-red-50 text-red-700' : seleccionado ? 'border-claro-primario bg-claro-primario text-white shadow-md' : 'border-green-200 bg-green-50 text-green-700 hover:-translate-y-0.5 hover:border-green-400'}`}>
-                                <span className="font-medium">{inicio} - {fin}</span><span className="text-xs font-semibold">{ocupado ? 'Reservada' : seleccionado ? 'Seleccionada' : 'Disponible'}</span>
-                            </button>;
+                            const clases = ocupado
+                                ? 'cursor-not-allowed border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
+                                : seleccionado
+                                ? 'border-claro-primario dark:border-oscuro-primario bg-claro-primario dark:bg-oscuro-primario text-white dark:text-oscuro-fondo shadow-md'
+                                : 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:-translate-y-0.5 hover:border-green-400 dark:hover:border-green-600';
+
+                            return (
+                                <button
+                                    key={inicio}
+                                    type="button"
+                                    disabled={ocupado}
+                                    onClick={() => seleccionarHorario(indice)}
+                                    className={`group flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${clases}`}
+                                >
+                                    <span className="font-medium">{inicio} - {fin}</span>
+                                    <span className="text-xs font-semibold">
+                                        {ocupado ? 'Reservada' : seleccionado ? 'Seleccionada' : 'Disponible'}
+                                    </span>
+                                </button>
+                            );
                         })}
                     </div>
-                    {mensajeHorario && <p className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">{mensajeHorario}</p>}
+
+                    {mensajeHorario && (
+                        <p className="mt-3 rounded-xl p-3 text-sm font-medium bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800/40">
+                            {mensajeHorario}
+                        </p>
+                    )}
                 </section>
             </div>
 
-            <section className="rounded-3xl border border-claro-borde bg-claro-tarjeta p-5 shadow-sm dark:bg-oscuro-tarjeta md:p-6">
+            {/* ============================================ */}
+            {/* PASO 2 · CONFIRMACIÓN                         */}
+            {/* ============================================ */}
+            <section className="rounded-3xl border border-claro-borde dark:border-oscuro-borde bg-claro-tarjeta dark:bg-oscuro-tarjeta p-5 shadow-sm md:p-6 transition-colors">
                 <div className="flex items-center justify-between gap-3">
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-claro-primario">Paso 2 · Confirmación</p>
-                        <h2 className="mt-1 text-lg font-semibold text-claro-texto dark:text-oscuro-texto">Resumen de reserva</h2>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-claro-primario dark:text-oscuro-primario">
+                            Paso 2 · Confirmación
+                        </p>
+                        <h2 className="mt-1 text-lg font-semibold text-claro-texto dark:text-oscuro-texto">
+                            Resumen de reserva
+                        </h2>
                     </div>
-                    <span className="text-lg font-bold text-claro-primario dark:text-cyan-300">{horasSeleccionadas.length ? `Bs. ${totalReserva.toFixed(2)}` : 'Selecciona un horario'}</span>
+                    <span className="text-lg font-bold text-claro-primario dark:text-oscuro-primario">
+                        {horasSeleccionadas.length ? `Bs. ${totalReserva.toFixed(2)}` : 'Selecciona un horario'}
+                    </span>
                 </div>
+
                 <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
-                    <div><p className="text-xs text-claro-texto2">Cancha</p><p className="font-medium">{cancha.nombre}</p></div>
-                    <div><p className="text-xs text-claro-texto2">Fecha</p><p className="font-medium">{new Date(`${fechaSeleccionada}T12:00:00`).toLocaleDateString('es-ES')}</p></div>
-                    <div><p className="text-xs text-claro-texto2">Horario</p><p className="font-medium">{horaSeleccionada ? `${horaSeleccionada[0]} - ${horaSeleccionada[1]}` : 'Selecciona un horario'}</p></div>
-                    <div><p className="text-xs text-claro-texto2">Precio base</p><p className="font-medium">Bs. {Number(cancha.precio_hora).toFixed(2)} / hora</p></div>
+                    <div>
+                        <p className="text-xs text-claro-texto2 dark:text-oscuro-texto2">Cancha</p>
+                        <p className="font-medium text-claro-texto dark:text-oscuro-texto">{cancha.nombre}</p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-claro-texto2 dark:text-oscuro-texto2">Fecha</p>
+                        <p className="font-medium text-claro-texto dark:text-oscuro-texto">
+                            {new Date(`${fechaSeleccionada}T12:00:00`).toLocaleDateString('es-ES')}
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-claro-texto2 dark:text-oscuro-texto2">Horario</p>
+                        <p className="font-medium text-claro-texto dark:text-oscuro-texto">
+                            {horaSeleccionada ? `${horaSeleccionada[0]} - ${horaSeleccionada[1]}` : 'Selecciona un horario'}
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-claro-texto2 dark:text-oscuro-texto2">Precio base</p>
+                        <p className="font-medium text-claro-texto dark:text-oscuro-texto">
+                            Bs. {Number(cancha.precio_hora).toFixed(2)} / hora
+                        </p>
+                    </div>
                 </div>
 
                 {esAdmin && (
                     <div className="mt-4">
-                        <label className="block text-sm font-medium text-claro-texto dark:text-oscuro-texto">Cliente asociado *</label>
-                        <select value={clienteSeleccionado} onChange={(event) => setClienteSeleccionado(event.target.value)} className="mt-1 w-full rounded-lg border border-claro-borde bg-transparent p-3 text-claro-texto dark:text-oscuro-texto">
+                        <label className="block text-sm font-medium text-claro-texto dark:text-oscuro-texto">
+                            Cliente asociado *
+                        </label>
+                        <select
+                            value={clienteSeleccionado}
+                            onChange={(event) => setClienteSeleccionado(event.target.value)}
+                            className="mt-1 w-full rounded-lg border border-claro-borde dark:border-oscuro-borde bg-claro-fondo dark:bg-oscuro-fondo p-3 text-claro-texto dark:text-oscuro-texto focus:outline-none focus:ring-2 focus:ring-claro-primario/40 dark:focus:ring-oscuro-primario/40"
+                        >
                             <option value="">Seleccione un cliente</option>
                             {clientes.map((cliente) => {
                                 const idCliente = cliente.id_cliente ?? cliente.id_usuario ?? cliente.id;
@@ -350,38 +507,101 @@ const DisponibilidadCancha = () => {
                                 );
                             })}
                         </select>
-                        {clientes.length === 0 && <p className="mt-1 text-xs text-red-600">No se encontraron clientes disponibles.</p>}
+                        {clientes.length === 0 && (
+                            <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                No se encontraron clientes disponibles.
+                            </p>
+                        )}
                     </div>
                 )}
 
-                <label className="mt-4 block text-sm">Observaciones
-                    <textarea value={observaciones} onChange={(event) => setObservaciones(event.target.value)} rows={2} className="mt-1 w-full rounded-lg border border-claro-borde bg-transparent p-3" placeholder="Indica alguna necesidad para tu reserva" />
+                <label className="mt-4 block text-sm font-medium text-claro-texto dark:text-oscuro-texto">
+                    Observaciones
+                    <textarea
+                        value={observaciones}
+                        onChange={(event) => setObservaciones(event.target.value)}
+                        rows={2}
+                        placeholder="Indica alguna necesidad para tu reserva"
+                        className="mt-1 w-full rounded-lg border border-claro-borde dark:border-oscuro-borde bg-claro-fondo dark:bg-oscuro-fondo p-3 text-claro-texto dark:text-oscuro-texto placeholder-claro-texto2 dark:placeholder-oscuro-texto2 resize-none focus:outline-none focus:ring-2 focus:ring-claro-primario/40 dark:focus:ring-oscuro-primario/40"
+                    />
                 </label>
-                <div className="mt-4 border-t border-claro-borde pt-4">
+
+                {/* Adicionales */}
+                <div className="mt-4 border-t border-claro-borde dark:border-oscuro-borde pt-4">
                     <div className="mb-2 flex items-center justify-between gap-3">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-claro-primario">Opcionales</p>
-                            <h3 className="mt-1 text-sm font-semibold text-claro-texto dark:text-oscuro-texto">Agrega servicios</h3>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-claro-primario dark:text-oscuro-primario">
+                                Opcionales
+                            </p>
+                            <h3 className="mt-1 text-sm font-semibold text-claro-texto dark:text-oscuro-texto">
+                                Agrega servicios
+                            </h3>
                         </div>
-                        <span className="text-xs font-semibold text-claro-primario dark:text-cyan-300">Adicionales: Bs. {subtotalAdicionales.toFixed(2)}</span>
+                        <span className="text-xs font-semibold text-claro-primario dark:text-oscuro-primario">
+                            Adicionales: Bs. {subtotalAdicionales.toFixed(2)}
+                        </span>
                     </div>
+
                     <div className="grid gap-2 md:grid-cols-3">
                         {SERVICIOS_ADICIONALES.map((servicio) => {
                             const seleccionado = Boolean(adicionalesSeleccionados[servicio.nombre]);
-                            return <label key={servicio.nombre} className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 transition ${seleccionado ? 'border-claro-primario bg-claro-primario/10' : 'border-claro-borde hover:border-claro-primario/50'}`}>
-                                <input type="checkbox" checked={seleccionado} onChange={() => setAdicionalesSeleccionados((actuales) => ({ ...actuales, [servicio.nombre]: !actuales[servicio.nombre] }))} className="h-4 w-4 shrink-0 accent-cyan-600" />
-                                <span className="min-w-0 truncate text-xs font-semibold text-claro-texto dark:text-oscuro-texto">{servicio.nombre}</span>
-                                <span className="ml-auto shrink-0 text-xs text-claro-texto2">Bs. {servicio.precio.toFixed(2)}</span>
-                            </label>;
+                            return (
+                                <label
+                                    key={servicio.nombre}
+                                    className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 transition-colors ${
+                                        seleccionado
+                                            ? 'border-claro-primario dark:border-oscuro-primario bg-claro-primario/10 dark:bg-oscuro-primario/10'
+                                            : 'border-claro-borde dark:border-oscuro-borde hover:border-claro-primario/50 dark:hover:border-oscuro-primario/50'
+                                    }`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={seleccionado}
+                                        onChange={() =>
+                                            setAdicionalesSeleccionados((actuales) => ({
+                                                ...actuales,
+                                                [servicio.nombre]: !actuales[servicio.nombre]
+                                            }))
+                                        }
+                                        className="h-4 w-4 shrink-0 accent-claro-primario dark:accent-oscuro-primario"
+                                    />
+                                    <span className="min-w-0 truncate text-xs font-semibold text-claro-texto dark:text-oscuro-texto">
+                                        {servicio.nombre}
+                                    </span>
+                                    <span className="ml-auto shrink-0 text-xs text-claro-texto2 dark:text-oscuro-texto2">
+                                        Bs. {servicio.precio.toFixed(2)}
+                                    </span>
+                                </label>
+                            );
                         })}
                     </div>
                 </div>
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-claro-tinte px-4 py-3 text-sm dark:bg-oscuro-tinte">
-                    <span className="text-claro-texto2">Cancha: Bs. {subtotalReserva.toFixed(2)} + adicionales: Bs. {subtotalAdicionales.toFixed(2)}</span>
-                    <strong className="text-base text-claro-primario dark:text-cyan-300">Total: Bs. {totalReserva.toFixed(2)}</strong>
+
+                {/* Total */}
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl px-4 py-3 text-sm bg-claro-tinte dark:bg-oscuro-tinte">
+                    <span className="text-claro-texto2 dark:text-oscuro-texto2">
+                        Cancha: Bs. {subtotalReserva.toFixed(2)} + adicionales: Bs. {subtotalAdicionales.toFixed(2)}
+                    </span>
+                    <strong className="text-base text-claro-primario dark:text-oscuro-primario">
+                        Total: Bs. {totalReserva.toFixed(2)}
+                    </strong>
                 </div>
-                <button type="button" disabled={!horaSeleccionada || guardando} onClick={crearReserva} className="mt-4 rounded-lg bg-claro-primario px-5 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">{guardando ? 'Creando reserva...' : 'Confirmar reserva y continuar al pago'}</button>
-                {reservaCreada && <p className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">Reserva #{reservaCreada} creada como pendiente. Puedes cerrar el pago y completarlo después desde Mis reservas.</p>}
+
+                {/* Botón confirmar */}
+                <button
+                    type="button"
+                    disabled={!horaSeleccionada || guardando}
+                    onClick={crearReserva}
+                    className="mt-4 rounded-lg px-5 py-3 font-semibold text-white dark:text-oscuro-fondo transition-all shadow-sm bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:hover:bg-oscuro-hover disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    {guardando ? 'Creando reserva...' : 'Confirmar reserva y continuar al pago'}
+                </button>
+
+                {reservaCreada && (
+                    <p className="mt-3 rounded-xl p-3 text-sm font-medium bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800/40">
+                        Reserva #{reservaCreada} creada como pendiente. Puedes cerrar el pago y completarlo después desde Mis reservas.
+                    </p>
+                )}
             </section>
 
             <ModalPago
